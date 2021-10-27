@@ -1,4 +1,5 @@
 from main_window import MainWindow
+from forms.game_form import GameForm
 
 import os
 
@@ -24,6 +25,7 @@ class App:
         self.window.setWindowTitle('Game')
         self.window.setGeometry(300, 300, self.window_size['w'], self.window_size['h'])
         self.central_widget.setGeometry(0, 0, self.window_size['w'], self.window_size['h'])
+        GameForm(self.central_widget)
 
     def run(self):
         self.window.show()

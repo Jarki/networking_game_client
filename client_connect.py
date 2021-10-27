@@ -42,36 +42,6 @@
 # #         else:
 # #             break
 
-# game_info_container = QHBoxLayout()
-# main_container.addLayout(game_info_container)
-#
-# player_info_container = QVBoxLayout()
-# game_info_container.addLayout(player_info_container)
-#
-# ping_label = QLabel(text='ping')
-# server_address_label = QLabel('server-addr')
-# opponent_info_label = QLabel('opponent')
-# game_log = QListWidget()
-# game_log.setGeometry(0, 0, 100, 100)
-# game_log.addItem('asas')
-# game_log.setMaximumWidth(int(window_size['w']/2))
-# game_log.setMaximumHeight(int(window_size['h']/2))
-#
-# player_info_container.addWidget(ping_label)
-# player_info_container.addWidget(server_address_label)
-# game_info_container.addWidget(game_log)
-#
-# game_action_container = QVBoxLayout()
-# game_action_container.setAlignment(QtCore.Qt.AlignCenter)
-#
-# message_input = QLineEdit()
-# message_input.setMaximumWidth(256)
-# message_button = QPushButton('Send message')
-#
-# game_action_container.addWidget(message_input)
-# game_action_container.addWidget(message_button)
-# main_container.addLayout(game_action_container)
-
 import app
 
 a = app.App()

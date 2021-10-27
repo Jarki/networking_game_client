@@ -23,6 +23,7 @@ class App:
 
         self.window.setWindowTitle('Game')
         self.window.setGeometry(300, 300, self.window_size['w'], self.window_size['h'])
+        self.central_widget.setGeometry(0, 0, self.window_size['w'], self.window_size['h'])
 
     def run(self):
         self.window.show()

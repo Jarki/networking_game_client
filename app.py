@@ -1,5 +1,6 @@
 from main_window import MainWindow
 from forms.game_form import GameForm
+import connection_logic as cl
 
 import os
 
@@ -25,7 +26,14 @@ class App:
         self.window.setWindowTitle('Game')
         self.window.setGeometry(300, 300, self.window_size['w'], self.window_size['h'])
         self.central_widget.setGeometry(0, 0, self.window_size['w'], self.window_size['h'])
-        GameForm(self.central_widget)
+
+        self.gf = GameForm(self.central_widget)
+        self.sc = cl.ServerCommunicator()
+        self.sc.connect_to_game(('127.0.0.1', 65432), "bob")
+
+        self.gu = cl.GameUpdater()
+        self.gu.set_game_form(self.gf)
+        self.gu.set_server_communicator(self.sc)
 
     def run(self):
         self.window.show()

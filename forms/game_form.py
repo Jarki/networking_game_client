@@ -67,8 +67,7 @@ class GameForm:
         self.game_log.addItem(msg)
 
     def set_button_handler(self, func):
-        """argument is a function that should take 1 str parameter"""
-        self.message_button.clicked.connect(func, self.__get_text())
+        self.message_button.clicked.connect(func)
 
-    def __get_text(self):
+    def get_text(self):
         return self.message_input.text()

@@ -53,3 +53,22 @@ class GameForm:
         self.game_action_container.addWidget(self.message_button)
 
         self.wrapper.addLayout(self.game_action_container)
+
+    def update_ping(self, number):
+        self.ping_label.setText(f'Ping: {number} ms')
+
+    def update_opponents_name(self, name):
+        self.opponent_info_label.setText(f'Opponent: {name}')
+
+    def update_server_address(self, address):
+        self.server_address_label.setText(f'Server address: {address}')
+
+    def update_log(self, msg):
+        self.game_log.addItem(msg)
+
+    def set_button_handler(self, func):
+        """argument is a function that should take 1 str parameter"""
+        self.message_button.clicked.connect(func, self.__get_text())
+
+    def __get_text(self):
+        return self.message_input.text()

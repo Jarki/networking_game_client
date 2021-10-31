@@ -41,7 +41,7 @@ class App:
     def __initialize_game_form(self):
         self.gf = GameForm(self.main_container, self.central_widget)
         self.sc = cl.ServerCommunicator()
-        # self.sc.connect_to_game(('127.0.0.1', 65432), "bob")
+        self.sc.connect_to_game(self.server_addr, self.player.to_string())
 
         self.gu = cl.GameUpdater()
         self.gu.set_game_form(self.gf)
@@ -49,7 +49,9 @@ class App:
 
     def __get_login_form_inputs(self):
         self.player = Player(self.login_form.get_name_input())
-        self.server_addr = self.login_form.get_server_addr_input()
+        self.server_addr = self.login_form.get_server_addr_input().split(':')
+        self.server_addr[1] = int(self.server_addr[1])
+        self.server_addr = tuple(self.server_addr)
 
         self.login_form.clear()
         self.__initialize_game_form()

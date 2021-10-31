@@ -11,6 +11,11 @@ class ServerCommunicator:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect(serv_addr)
 
+        self.sock.sendall(b'want connect')
+
+        if not self.sock.recv(1024) == b'connected':
+            return
+
         self.sock.sendall(str.encode(player_info))
 
     def listen_to_updates(self, callback):

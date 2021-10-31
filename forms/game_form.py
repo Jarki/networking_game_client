@@ -2,17 +2,20 @@ from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QLabel, QListWidget, QLineEdit, QPushButton
 from PyQt5.QtCore import Qt
 
+from forms.basic_form import BasicForm
 
-class GameForm:
-    def __init__(self, container_widget):
-        self.container = container_widget
 
-        width = self.container.geometry().width()
-        height = self.container.geometry().height()
+class GameForm(BasicForm):
+    def __init__(self, container_layout, container_widget):
+        super().__init__()
+        self.container = container_layout
+
+        width = container_widget.geometry().width()
+        height = container_widget.geometry().height()
 
         # wrapper for all widgets in the form
         self.wrapper = QVBoxLayout()
-        self.container.setLayout(self.wrapper)
+        self.container.addLayout(self.wrapper)
 
         # game info container
         self.game_info_container = QHBoxLayout()
@@ -31,7 +34,6 @@ class GameForm:
 
         # list widget to keep track of player actions
         self.game_log = QListWidget()
-        self.game_log.setGeometry(0, 0, 100, 100)
         self.game_log.setMaximumWidth(int(width / 2))
         self.game_log.setMaximumHeight(int(height / 2))
 

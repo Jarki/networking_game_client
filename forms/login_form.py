@@ -2,19 +2,20 @@ from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QLabel, QListWidget, QLineEdit, QPushButton
 from PyQt5.QtCore import Qt
 
+from forms.basic_form import BasicForm
 
-class LoginForm():
-    def __init__(self, container_widget):
-        self.container = container_widget
-        self.container.window().setWindowTitle('Login')
-        width = 450
-        height = 270
-        self.container.window().setGeometry(200, 200, width, height)
+
+class LoginForm(BasicForm):
+    def __init__(self, container_layout, central_widget):
+        super().__init__()
+
+        self.container = container_layout
+        central_widget.window().setWindowTitle('Login')
 
         # wrapper for all widgets in the form
         self.wrapper = QVBoxLayout()
         self.wrapper.setAlignment(Qt.AlignCenter)
-        self.container.setLayout(self.wrapper)
+        self.container.addLayout(self.wrapper)
 
         # labels
         self.name_label = QLabel(text='Your name:')

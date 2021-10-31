@@ -7,16 +7,21 @@ from player import Player
 import os
 
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QHBoxLayout
 
 
 class App:
     def __init__(self):
         os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = "platforms/"
 
-        # self.__initialize_game_form()
-
         self.app = QApplication([])
+
+        self.__create_window()
+
+        self.login_form = LoginForm(self.main_container, self.central_widget)
+        self.login_form.add_join_button_handler(self.__get_login_form_inputs)
+
+    def __create_window(self):
         self.window = MainWindow()
 
         self.window_size = {
@@ -27,19 +32,16 @@ class App:
         self.central_widget = QWidget()
         self.window.setCentralWidget(self.central_widget)
 
-        self.window.setWindowTitle('Game')
         self.window.setGeometry(300, 300, self.window_size['w'], self.window_size['h'])
         self.central_widget.setGeometry(0, 0, self.window_size['w'], self.window_size['h'])
 
-        self.login_form = LoginForm(self.central_widget)
-        self.login_form.add_join_button_handler(self.__get_login_form_inputs)
+        self.main_container = QHBoxLayout()
+        self.central_widget.setLayout(self.main_container)
 
     def __initialize_game_form(self):
-        self.__clear_window()
-
-        self.gf = GameForm(self.central_widget)
+        self.gf = GameForm(self.main_container, self.central_widget)
         self.sc = cl.ServerCommunicator()
-        self.sc.connect_to_game(('127.0.0.1', 65432), "bob")
+        # self.sc.connect_to_game(('127.0.0.1', 65432), "bob")
 
         self.gu = cl.GameUpdater()
         self.gu.set_game_form(self.gf)
@@ -49,10 +51,8 @@ class App:
         self.player = Player(self.login_form.get_name_input())
         self.server_addr = self.login_form.get_server_addr_input()
 
+        self.login_form.clear()
         self.__initialize_game_form()
-
-    def __clear_window(self):
-        pass
 
     def run(self):
         self.window.show()

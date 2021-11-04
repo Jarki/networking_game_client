@@ -1,3 +1,4 @@
+import logging
 import socket
 import time
 
@@ -17,10 +18,14 @@ class ServerCommunicator:
             return
 
         self.sock.sendall(str.encode(player_info))
+        logging.debug(f'Successfully connected')
 
     def listen_to_updates(self, callback):
+        logging.debug(f'Listening to server')
         while True:
             data = self.sock.recv(1024)
+            logging.debug(f'Received a message: {data}')
+
             callback(data)
 
     def send_message(self, message):

@@ -1,4 +1,5 @@
 import threading
+import logging
 
 from connection_logic.server_communicator import ServerCommunicator
 from forms.game_form import GameForm

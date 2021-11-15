@@ -1,3 +1,5 @@
+from game.tiles.constraints import Constraints
+
 from PyQt5.QtWidgets import QPushButton
 
 
@@ -21,11 +23,11 @@ class PushTile(QPushButton):
 
     def make_vertical(self):
         self.is_vertical = True
-        self.setMaximumSize(8, 42)
+        self.setMaximumSize(Constraints.smaller_distance, Constraints.bigger_distance)
 
     def make_horizontal(self):
         self.is_vertical = False
-        self.setMaximumSize(42, 8)
+        self.setMaximumSize(Constraints.bigger_distance, Constraints.smaller_distance)
 
     def push(self, turn_number):
         self.turn_pushed = turn_number

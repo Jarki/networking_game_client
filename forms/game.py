@@ -2,7 +2,9 @@ from forms.basic_form import BasicForm
 from game.board import Board
 
 
-from PyQt5.QtWidgets import QGridLayout, QVBoxLayout, QPushButton, QWidget, QLayout
+from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QVBoxLayout, QLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QLayout
+
 from PyQt5.QtCore import Qt
 
 
@@ -10,76 +12,48 @@ class Game(BasicForm):
     def __init__(self, container_layout: QLayout, container_widget: QWidget):
         super().__init__()
 
-        self.wrapper = QGridLayout()
-        self.wrapper.setSpacing(0)
-        self.wrapper.setAlignment(Qt.AlignmentFlag.AlignAbsolute)
+        self.container = QHBoxLayout()
 
-        def hello(button):
-            button.sender().setStyleSheet('background:#000')
+        self.board_wrapper = QGridLayout()
+        self.board_wrapper.setSpacing(0)
+        self.board_wrapper.setAlignment(Qt.AlignmentFlag.AlignAbsolute)
 
-        Board(10).draw(self.wrapper)
-        # cutout_num = 0
-        #
-        # # works somehow
-        # for i in range(21):
-        #     if i < 11:
-        #         if not i % 2:
-        #             cutout_num = i + 2
-        #
-        #     if i >= 11:
-        #         if i % 2:
-        #             cutout_num = i - 2 * abs(20 / 2 - i) + 1
-        #
-        #     for j in range(21):
-        #         button = QPushButton('')
-        #
-        #         if not i % 2:
-        #             if not j % 2:
-        #                 button.setMaximumWidth(8)
-        #                 button.setMaximumHeight(8)
-        #                 button.setEnabled(False)
-        #             else:
-        #                 button.setMaximumWidth(42)
-        #                 button.setMaximumHeight(8)
-        #                 # button.setText(f'{cutout_num}')
-        #         else:
-        #             if not j % 2:
-        #                 button.setMaximumWidth(8)
-        #                 button.setMaximumHeight(42)
-        #             else:
-        #                 # button.setText(f'{cutout_num}')
-        #                 button.setMaximumSize(42, 42)
-        #                 button.setEnabled(False)
-        #
-        #         if abs((20 / 2) - j) - cutout_num >= 1:
-        #             button.setVisible(False)
-        #
-        #         button.clicked.connect(lambda: hello(button))
-        #         self.wrapper.addWidget(button, i, j)
+        self.game_info = QVBoxLayout()
+        self.active_player_label = QLabel('Current player')
+        self.turn_number_label = QLabel('Turn #')
 
+        self.game_info.addWidget(self.active_player_label)
+        self.game_info.addWidget(self.turn_number_label)
+        self.game_info.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.game_info.setContentsMargins(0, 0, 20, 0)
 
-        # for i in range(20):
-        #     for j in range(10):
-        #         button = QPushButton(f'')
-        #
-        #         if j % 2 == 0:
-        #             button.setMaximumWidth(8)
-        #             button.setMinimumHeight(42)
-        #         else:
-        #             button.setMaximumHeight(8)
-        #             button.setMaximumWidth(50)
-        #
-        #         button.clicked.connect(hello)
-        #
-        #         button.setStyleSheet("background:#fff;border:1px solid #000")
-        #         self.wrapper.addWidget(button, i, j)
-        #
-        #     if i % 2:
-        #         button = QPushButton(f'')
-        #         button.setMaximumWidth(8)
-        #         button.setMinimumHeight(42)
-        #         button.setStyleSheet("background:#f00;border:1px solid #000; margin-left:-1px")
-        #         self.wrapper.addWidget(button, i, 11)
+        self.container.addLayout(self.board_wrapper)
+        self.container.addLayout(self.game_info)
 
-        container_layout.addLayout(self.wrapper)
+        container_layout.addLayout(self.container)
+
+        self.opponent = ""
+
+        # setup game board
+        self.board = None
+        self.setup_board()
+
+    def setup_board(self):
+        self.board = Board(10)
+        self.board.draw(self.board_wrapper)
+
+        self.board.set_event_handler("active_player_toggled", self.on_player_toggle)
+        self.board.set_event_handler("new_turn", self.on_new_turn)
+
+    def on_player_toggle(self, b: Board):
+        if b.active_player:
+            self.active_player_label.setText('Your turn')
+        else:
+            self.active_player_label.setText(f'{self.opponent}s\' turn')
+
+    def on_new_turn(self, b: Board):
+        self.turn_number_label.setText(f'Turn #{b.turn}')
+
+    def update(self, pos: tuple):
+        self.board.push(pos)
 

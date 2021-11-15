@@ -43,6 +43,12 @@ class Board:
 
         return False
 
+    def __set_appropriate_color(self, i, j):
+        if self.active_player:
+            self.board[i][j].setStyleSheet("background: blue")
+        else:
+            self.board[i][j].setStyleSheet("background: red")
+
     def push_handler(self, tile: PushTile):
         tile.setStyleSheet('background:#000')
 
@@ -53,16 +59,16 @@ class Board:
         self.toggle_active_player()
         if tile.is_vertical:
             if self.check_tile(i, j - 1) > 0:
-                self.board[i][j - 1].setStyleSheet("background: blue")
+                self.__set_appropriate_color(i, j - 1)
 
             if self.check_tile(i, j + 1) > 0:
-                self.board[i][j + 1].setStyleSheet("background: blue")
+                self.__set_appropriate_color(i, j + 1)
         else:
             if self.check_tile(i + 1, j) > 0:
-                self.board[i + 1][j].setStyleSheet("background: red")
+                self.__set_appropriate_color(i + 1, j)
 
             if self.check_tile(i - 1, j) > 0:
-                self.board[i - 1][j].setStyleSheet("background: red")
+                self.__set_appropriate_color(i - 1, j)
 
     def check_tile(self, i, j):
         if not self.__is_in_bounds((i, j)):

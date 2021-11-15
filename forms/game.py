@@ -46,7 +46,7 @@ class Game(BasicForm):
         self.board.set_event_handler("new_turn", self.on_new_turn)
 
     def on_player_toggle(self, b: Board):
-        if b.active_player:
+        if not b.active_player:
             self.active_player_label.setText('Your turn')
         else:
             self.active_player_label.setText(f'{self.opponent}s\' turn')

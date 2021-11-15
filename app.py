@@ -1,8 +1,10 @@
 from main_window import MainWindow
 from forms.game_form import GameForm
 from forms.login_form import LoginForm
+from forms.game import Game
 import connection_logic as cl
 from player import Player
+from game.board import Board
 
 import os
 
@@ -18,8 +20,10 @@ class App:
 
         self.__create_window()
 
-        self.login_form = LoginForm(self.main_container, self.central_widget)
-        self.login_form.add_join_button_handler(self.__get_login_form_inputs)
+        # self.login_form = LoginForm(self.main_container, self.central_widget)
+        # self.login_form.add_join_button_handler(self.__get_login_form_inputs)
+
+        self.game_gui = Game(self.main_container, self.central_widget)
 
     def __create_window(self):
         self.window = MainWindow()

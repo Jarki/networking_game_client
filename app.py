@@ -23,7 +23,7 @@ class App:
         # self.login_form = LoginForm(self.main_container, self.central_widget)
         # self.login_form.add_join_button_handler(self.__get_login_form_inputs)
 
-        self.game_gui = Game(self.main_container, self.central_widget)
+        self.__initialize_game_form()
 
     def __create_window(self):
         self.window = MainWindow()
@@ -43,13 +43,12 @@ class App:
         self.central_widget.setLayout(self.main_container)
 
     def __initialize_game_form(self):
-        self.gf = GameForm(self.main_container, self.central_widget)
-        self.sc = cl.ServerCommunicator()
-        self.sc.connect_to_game(('127.0.0.1', 65432), self.player.to_string())
+        self.gf = Game(self.main_container, self.central_widget)
 
         self.gu = cl.GameUpdater()
         self.gu.set_game_form(self.gf)
-        self.gu.set_server_communicator(self.sc)
+
+        self.gu.start_game('Josh')
 
     def __get_login_form_inputs(self):
         self.player = Player(self.login_form.get_name_input())

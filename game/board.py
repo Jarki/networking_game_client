@@ -13,17 +13,29 @@ class Board:
         self.turn = 1
 
         self.event_handlers = {
+            "button_pressed": lambda x: x,
             "active_player_toggled": lambda x: x,
-            "new_turn": lambda x: x
+            "new_turn": lambda x: x,
+            "point": lambda x: x
         }
 
-        self.active_player = not is_first_turn
-        self.toggle_active_player()
+        self.player1_points = 0
+        self.player2_points = 0
+
+        self.active_player = is_first_turn
 
     def toggle_active_player(self):
         self.active_player = not self.active_player
 
         self.event_handlers["active_player_toggled"](self)
+
+    def give_point(self):
+        if self.active_player:
+            self.player1_points += 1
+        else:
+            self.player2_points += 1
+
+        self.event_handlers['point'](self)
 
     def new_turn(self, tile):
         tile.push(self.turn)
@@ -32,9 +44,8 @@ class Board:
         self.event_handlers["new_turn"](self)
 
     def set_event_handler(self, event_name, callback):
-        logging.debug(f'set a handler for event {event_name}')
-
         if event_name in self.event_handlers:
+            logging.debug(f'set a handler for event {event_name}')
             self.event_handlers[event_name] = callback
 
     def __is_in_bounds(self, indexes: tuple):
@@ -54,21 +65,34 @@ class Board:
 
         self.new_turn(tile)
 
-        # check if left big tile is enclosed
         i, j = tile.i, tile.j
-        self.toggle_active_player()
+        self.event_handlers['button_pressed']((i, j))
+
+        need_toggle = True
+
         if tile.is_vertical:
             if self.check_tile(i, j - 1) > 0:
                 self.__set_appropriate_color(i, j - 1)
+                need_toggle = False
+                self.give_point()
 
             if self.check_tile(i, j + 1) > 0:
                 self.__set_appropriate_color(i, j + 1)
+                need_toggle = False
+                self.give_point()
         else:
             if self.check_tile(i + 1, j) > 0:
                 self.__set_appropriate_color(i + 1, j)
+                need_toggle = False
+                self.give_point()
 
             if self.check_tile(i - 1, j) > 0:
                 self.__set_appropriate_color(i - 1, j)
+                need_toggle = False
+                self.give_point()
+
+        if need_toggle:
+            self.toggle_active_player()
 
     def check_tile(self, i, j):
         if not self.__is_in_bounds((i, j)):

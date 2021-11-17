@@ -6,6 +6,7 @@ import connection_logic as cl
 from player import Player
 from game.board import Board
 
+import time
 import os
 
 from PyQt5.QtWidgets import QApplication
@@ -20,10 +21,8 @@ class App:
 
         self.__create_window()
 
-        # self.login_form = LoginForm(self.main_container, self.central_widget)
-        # self.login_form.add_join_button_handler(self.__get_login_form_inputs)
-
-        self.__initialize_game_form()
+        self.login_form = LoginForm(self.main_container, self.central_widget)
+        self.login_form.add_join_button_handler(self.__get_login_form_inputs)
 
     def __create_window(self):
         self.window = MainWindow()
@@ -48,13 +47,13 @@ class App:
         self.gu = cl.GameUpdater()
         self.gu.set_game_form(self.gf)
 
-        self.gu.start_game('Josh')
+        self.gu.start_game(self.player.name)
 
     def __get_login_form_inputs(self):
         self.player = Player(self.login_form.get_name_input())
         self.server_addr = self.login_form.get_server_addr_input().split(':')
-        #self.server_addr[1] = int(self.server_addr[1])
-        #self.server_addr = tuple(self.server_addr)
+        # self.server_addr[1] = int(self.server_addr[1])
+        # self.server_addr = tuple(self.server_addr)
 
         self.login_form.clear()
         self.__initialize_game_form()

@@ -21,12 +21,6 @@ class ServerCommunicator:
         self.sock.sendall(str.encode(player_info))
         logging.debug(f'Successfully connected')
 
-        logging.debug('Waiting for the second player')
-        opponent = self.sock.recv(1024)  # get opponents name
-
-        has_first_turn = self.sock.recv(1024)  # get if the player has first turn
-        return opponent.decode('utf-8'), has_first_turn.decode('utf-8')
-
     def listen_to_updates(self, callback):
         logging.debug(f'Listening to server')
         while True:

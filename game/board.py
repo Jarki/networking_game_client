@@ -6,7 +6,7 @@ from game.tiles.big_tile import BigTile
 
 
 class Board:
-    def __init__(self, size, is_first_turn=True):
+    def __init__(self, size):
         self.size = size * 2 + 1
         self.board: list[list[PushTile]] = [[PushTile(0, 0)] * self.size for i in range(self.size)]
 
@@ -22,7 +22,7 @@ class Board:
         self.player1_points = 0
         self.player2_points = 0
 
-        self.active_player = is_first_turn
+        self.active_player = False
 
     def toggle_active_player(self):
         self.active_player = not self.active_player
@@ -61,6 +61,9 @@ class Board:
             self.board[i][j].setStyleSheet("background: red")
 
     def push_handler(self, tile: PushTile):
+        if not self.active_player:
+            return
+
         tile.setStyleSheet('background:#000')
 
         self.new_turn(tile)
@@ -161,4 +164,34 @@ class Board:
     def push(self, pos: tuple[int, int]):
         tile: PushTile = self.board[pos[0]][pos[1]]
 
-        self.push_handler(tile)
+        tile.setStyleSheet('background:#000')
+
+        self.new_turn(tile)
+
+        i, j = tile.i, tile.j
+
+        need_toggle = True
+
+        if tile.is_vertical:
+            if self.check_tile(i, j - 1) > 0:
+                self.__set_appropriate_color(i, j - 1)
+                need_toggle = False
+                self.give_point()
+
+            if self.check_tile(i, j + 1) > 0:
+                self.__set_appropriate_color(i, j + 1)
+                need_toggle = False
+                self.give_point()
+        else:
+            if self.check_tile(i + 1, j) > 0:
+                self.__set_appropriate_color(i + 1, j)
+                need_toggle = False
+                self.give_point()
+
+            if self.check_tile(i - 1, j) > 0:
+                self.__set_appropriate_color(i - 1, j)
+                need_toggle = False
+                self.give_point()
+
+        if need_toggle:
+            self.toggle_active_player()

@@ -56,8 +56,10 @@ class Game(BasicForm):
     def set_opponent(self, name):
         self.opponent = name
 
-    def setup_board(self, has_first_turn=True):
-        self.board = Board(10, has_first_turn)
+        self.player2_points_label.setText(f'{self.opponent}s\' points: 0')
+
+    def setup_board(self):
+        self.board = Board(10)
         self.board.draw(self.board_wrapper)
 
         self.board.set_event_handler("button_pressed", self.on_push)
@@ -92,4 +94,7 @@ class Game(BasicForm):
 
     def update(self, pos: tuple):
         self.board.push(pos)
+
+    def update_chat(self, update):
+        self.game_chat.addItem(update)
 

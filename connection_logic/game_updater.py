@@ -14,6 +14,7 @@ class GameUpdater:
     def set_game_form(self, game_form: Game):
         self.game = game_form
         self.game.set_event_handler('update', self.send_update)
+        self.game.set_event_handler('message', self.send_message)
 
     def set_server_communicator(self, server_comm: ServerCommunicator):
         self.server_comm = server_comm
@@ -22,6 +23,7 @@ class GameUpdater:
         logging.debug("Starting the game")
 
         self.server_comm.connect_to_game(name, server_addr)
+        self.game.set_player(name)
         self.game.setup_board()
 
         threading.Thread(target=self.server_comm.listen_to_updates, args=[self.update_game]).start()
@@ -52,6 +54,14 @@ class GameUpdater:
             if entry == 'wait':
                 self.game.update_chat('Waiting for second player...')
 
+            pattern = re.compile('msg:[a-zA-Z1-9]+:.+')
+            if pattern.match(entry) is not None:
+                # message looks like msg:player1:hello
+                msg = entry.replace('msg:', '')  # remove the word msg
+                logging.debug(f'Message: {msg}')
+                self.game.update_chat(msg)  # display message in chat
+                return  # don't need the function to continue
+
             pattern = re.compile('opponent:[a-zA-Z1-9]+')
             if pattern.match(entry) is not None:
                 # message looks like Opponent:player1
@@ -72,3 +82,6 @@ class GameUpdater:
         update = f'push({_input[0]},{_input[1]})'
 
         self.server_comm.send_message(update)
+
+    def send_message(self, message):
+        self.server_comm.send_message(f'msg:{self.game.player}:{message}')

@@ -158,9 +158,6 @@ class Board:
 
                 wrapper.addWidget(tile, i, j)
 
-    def __check_big_tile(self, i: int, j: int):
-        self.board[i][j].setStyleSheet("background:black")
-
     def push(self, pos: tuple[int, int]):
         tile: PushTile = self.board[pos[0]][pos[1]]
 

@@ -10,7 +10,7 @@ import time
 import os
 
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QWidget, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QHBoxLayout, QMessageBox
 
 
 class App:
@@ -23,6 +23,7 @@ class App:
 
         self.login_form = LoginForm(self.main_container, self.central_widget)
         self.login_form.add_join_button_handler(self.__get_login_form_inputs)
+        # Game(self.main_container, self.central_widget)
 
     def __create_window(self):
         self.window = MainWindow()
@@ -51,9 +52,14 @@ class App:
 
     def __get_login_form_inputs(self):
         self.player = Player(self.login_form.get_name_input())
-        self.server_addr = self.login_form.get_server_addr_input().split(':')
-        # self.server_addr[1] = int(self.server_addr[1])
-        # self.server_addr = tuple(self.server_addr)
+
+        if self.login_form.get_server_addr_input() != "":
+            try:
+                self.server_addr = self.login_form.get_server_addr_input().split(':')
+                self.server_addr[1] = int(self.server_addr[1])
+                self.server_addr = tuple(self.server_addr)
+            except Exception:
+                QMessageBox().setText("Wrong address.")
 
         self.login_form.clear()
         self.__initialize_game_form()

@@ -4,7 +4,7 @@ from game.board import Board
 import logging
 
 from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QVBoxLayout, QLayout
-from PyQt5.QtWidgets import QWidget, QLabel, QListWidget
+from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QLineEdit, QPushButton
 
 from PyQt5.QtCore import Qt
 
@@ -22,9 +22,26 @@ class Game(BasicForm):
         self.game_info_wrapper = QVBoxLayout()
         self.game_info = QVBoxLayout()
 
+        # some actions player can perform
+        self.game_actions = QVBoxLayout()
+
         self.game_chat = QListWidget()
         self.game_chat.setMaximumWidth(200)
 
+        self.message_input = QLineEdit()
+        self.message_input.setMaximumWidth(200)
+        self.message_input.setPlaceholderText('Enter message')
+        self.send_button = QPushButton('Send message')
+        self.send_button.clicked.connect(self.send_message)
+        self.end_game_button = QPushButton('Vote to end game')
+        self.end_game_button.clicked.connect(self.end_game)
+
+        self.game_actions.addWidget(self.game_chat)
+        self.game_actions.addWidget(self.message_input)
+        self.game_actions.addWidget(self.send_button)
+        self.game_actions.addWidget(self.end_game_button)
+
+        # game info
         self.active_player_label = QLabel('Current player')
         self.turn_number_label = QLabel('Turn #')
         self.player1_points_label = QLabel('Your points: 0')
@@ -38,7 +55,7 @@ class Game(BasicForm):
         self.game_info.setContentsMargins(0, 0, 50, 20)
 
         self.game_info_wrapper.addLayout(self.game_info)
-        self.game_info_wrapper.addWidget(self.game_chat)
+        self.game_info_wrapper.addLayout(self.game_actions)
 
         self.container.addLayout(self.board_wrapper)
         self.container.addLayout(self.game_info_wrapper)
@@ -46,17 +63,31 @@ class Game(BasicForm):
         container_layout.addLayout(self.container)
 
         self.event_handlers = {
-            "update": lambda x: x
+            "update": lambda x: x,
+            "message": lambda x: x,
+            "end_game": lambda x: x
         }
 
         # setup game board
+        self.player = ""
         self.opponent = ""
         self.board = None
+
+    def set_player(self, name):
+        self.player = name
 
     def set_opponent(self, name):
         self.opponent = name
 
         self.player2_points_label.setText(f'{self.opponent}s\' points: 0')
+
+    def send_message(self):
+        message = self.message_input.text()
+
+        self.event_handlers['message'](message)
+
+    def end_game(self):
+        self.event_handlers['end_game'](self.player)
 
     def setup_board(self):
         self.board = Board(10)

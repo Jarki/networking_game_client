@@ -4,6 +4,9 @@ import time
 
 
 class ServerCommunicator:
+    class ZeroBytesReceivedError(Exception):
+        pass
+
     def __init__(self):
         self.sock = None
 
@@ -21,13 +24,18 @@ class ServerCommunicator:
         self.sock.sendall(str.encode(player_info))
         logging.debug(f'Successfully connected')
 
-    def listen_to_updates(self, callback):
-        logging.debug(f'Listening to server')
-        while True:
-            data = self.sock.recv(1024)
-            logging.debug(f'Received a message: {data}')
+    def disconnect(self):
+        self.sock.close()
 
-            callback(data)
+    def listen_to_updates(self, callback):
+        data = self.sock.recv(1024)
+
+        if len(data) == 0:
+            raise self.ZeroBytesReceivedError('Received 0 bytes from server')
+
+        logging.debug(f'Received a message: {data}')
+
+        callback(data)
 
     def send_message(self, message):
         self.sock.sendall(str.encode(message))

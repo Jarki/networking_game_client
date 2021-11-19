@@ -1,5 +1,6 @@
+import socket
+
 from main_window import MainWindow
-from forms.game_form import GameForm
 from forms.login_form import LoginForm
 from forms.game import Game
 import connection_logic as cl
@@ -23,7 +24,8 @@ class App:
 
         self.login_form = LoginForm(self.main_container, self.central_widget)
         self.login_form.add_join_button_handler(self.__get_login_form_inputs)
-        # Game(self.main_container, self.central_widget)
+
+        self.server_addr: tuple[str, int] = ("127.0.0.1", 65432)
 
     def __create_window(self):
         self.window = MainWindow()
@@ -42,27 +44,42 @@ class App:
         self.main_container = QHBoxLayout()
         self.central_widget.setLayout(self.main_container)
 
-    def __initialize_game_form(self):
-        self.gf = Game(self.main_container, self.central_widget)
-
-        self.gu = cl.GameUpdater()
-        self.gu.set_game_form(self.gf)
-
-        self.gu.start_game(self.player.name)
-
     def __get_login_form_inputs(self):
         self.player = Player(self.login_form.get_name_input())
 
         if self.login_form.get_server_addr_input() != "":
             try:
-                self.server_addr = self.login_form.get_server_addr_input().split(':')
-                self.server_addr[1] = int(self.server_addr[1])
-                self.server_addr = tuple(self.server_addr)
-            except Exception:
-                QMessageBox().setText("Wrong address.")
+                server_addr = self.login_form.get_server_addr_input().split(':')
+                server_addr[1] = int(server_addr[1])
+                server_addr = tuple(server_addr)
+                self.server_addr = server_addr
+                print(self.server_addr)
+            except IndexError:
+                msg = QMessageBox()
+                msg.setText("Wrong address.")
+                msg.addButton(QMessageBox.Ok)
+                msg.exec()
+                return
+
+        self.__start_game()
+
+    def __start_game(self):
+        self.gu = cl.GameUpdater()
+
+        self.gf = Game(self.main_container, self.central_widget)
+
+        self.gu.set_game_form(self.gf)
+        try:
+            self.gu.start_game(self.player.name, self.server_addr)
+        except socket.gaierror:
+            msg = QMessageBox()
+            msg.setText("Could not connect to the server")
+            msg.addButton(QMessageBox.Ok)
+            msg.exec()
+            return
 
         self.login_form.clear()
-        self.__initialize_game_form()
+        self.gf.build(self.main_container, self.central_widget)
 
     def run(self):
         self.window.show()

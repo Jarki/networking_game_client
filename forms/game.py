@@ -4,7 +4,7 @@ from game.board import Board
 import logging
 
 from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QVBoxLayout, QLayout
-from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QLineEdit, QPushButton
+from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QLineEdit, QPushButton, QMessageBox
 
 from PyQt5.QtCore import Qt
 
@@ -46,11 +46,15 @@ class Game(BasicForm):
         self.turn_number_label = QLabel('Turn #')
         self.player1_points_label = QLabel('Your points: 0')
         self.player2_points_label = QLabel(f'Your opponents\' points: 0')
+        self.game_status = QLabel('Game is being played')
+        self.winner_label = QLabel('')
 
         self.game_info.addWidget(self.active_player_label)
         self.game_info.addWidget(self.turn_number_label)
         self.game_info.addWidget(self.player1_points_label)
         self.game_info.addWidget(self.player2_points_label)
+        self.game_info.addWidget(self.winner_label)
+        self.game_info.addWidget(self.game_status)
         self.game_info.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.game_info.setContentsMargins(0, 0, 50, 20)
 
@@ -59,8 +63,6 @@ class Game(BasicForm):
 
         self.container.addLayout(self.board_wrapper)
         self.container.addLayout(self.game_info_wrapper)
-
-        container_layout.addLayout(self.container)
 
         self.event_handlers = {
             "update": lambda x: x,
@@ -72,6 +74,12 @@ class Game(BasicForm):
         self.player = ""
         self.opponent = ""
         self.board = None
+
+        self.voted_to_end = False
+
+    def build(self, container_layout: QLayout, container_widget: QWidget):
+        container_widget.window().setWindowTitle('Game')
+        container_layout.addLayout(self.container)
 
     def set_player(self, name):
         self.player = name
@@ -86,8 +94,18 @@ class Game(BasicForm):
 
         self.event_handlers['message'](message)
 
+    def set_game_status(self, status):
+        self.game_status.setText(status)
+
     def end_game(self):
-        self.event_handlers['end_game'](self.player)
+        self.voted_to_end = not self.voted_to_end
+
+        if not self.voted_to_end:
+            self.game_chat.addItem('You\'re no longer voting to end the game')
+            self.event_handlers['end_game']('unleave')
+        else:
+            self.game_chat.addItem('You voted to end the game')
+            self.event_handlers['end_game']('leave')
 
     def setup_board(self):
         self.board = Board(10)
@@ -97,6 +115,9 @@ class Game(BasicForm):
         self.board.set_event_handler("active_player_toggled", self.on_player_toggle)
         self.board.set_event_handler("new_turn", self.on_new_turn)
         self.board.set_event_handler("point", self.on_point_update)
+
+    def set_winner(self, winner):
+        self.winner_label.setText(winner)
 
     def set_event_handler(self, event_name, callback):
         if event_name in self.event_handlers:
@@ -128,4 +149,5 @@ class Game(BasicForm):
 
     def update_chat(self, update):
         self.game_chat.addItem(update)
+        self.game_chat.scrollToBottom()
 

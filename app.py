@@ -1,14 +1,11 @@
-import socket
-
 from main_window import MainWindow
 from forms.login_form import LoginForm
 from forms.game import Game
 import connection_logic as cl
 from player import Player
-from game.board import Board
 
-import time
 import os
+import socket
 
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QMessageBox

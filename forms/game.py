@@ -46,8 +46,12 @@ class Game(BasicForm):
         self.turn_number_label = QLabel('Turn #')
         self.player1_points_label = QLabel('Your points: 0')
         self.player2_points_label = QLabel(f'Your opponents\' points: 0')
-        self.game_status = QLabel('Game is being played')
+        self.game_status = QLabel('Game is in progress')
         self.winner_label = QLabel('')
+        self.stats_label = QLabel('Your stats:')
+        self.wins_label = QLabel('Wins: ')
+        self.losses_label = QLabel('Losses: ')
+        self.draws_label = QLabel('Draws: ')
 
         self.game_info.addWidget(self.active_player_label)
         self.game_info.addWidget(self.turn_number_label)
@@ -55,6 +59,10 @@ class Game(BasicForm):
         self.game_info.addWidget(self.player2_points_label)
         self.game_info.addWidget(self.winner_label)
         self.game_info.addWidget(self.game_status)
+        self.game_info.addWidget(self.stats_label)
+        self.game_info.addWidget(self.wins_label)
+        self.game_info.addWidget(self.losses_label)
+        self.game_info.addWidget(self.draws_label)
         self.game_info.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.game_info.setContentsMargins(0, 0, 50, 20)
 
@@ -67,7 +75,8 @@ class Game(BasicForm):
         self.event_handlers = {
             "update": lambda x: x,
             "message": lambda x: x,
-            "end_game": lambda x: x
+            "end_game": lambda x: x,
+            "get_stats": lambda x: x
         }
 
         # setup game board
@@ -78,8 +87,12 @@ class Game(BasicForm):
         self.voted_to_end = False
 
     def build(self, container_layout: QLayout, container_widget: QWidget):
-        container_widget.window().setWindowTitle('Game')
         container_layout.addLayout(self.container)
+
+    def set_stats(self, stats: tuple[int]):
+        self.wins_label.setText(f'Wins:{stats[0]}')
+        self.losses_label.setText(f'Losses: {stats[1]}')
+        self.draws_label.setText(f'Draws:{stats[2]}')
 
     def set_player(self, name):
         self.player = name

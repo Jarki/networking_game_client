@@ -65,6 +65,7 @@ class App:
 
         self.gf = Game(self.main_container, self.central_widget)
 
+        self.window.setWindowTitle(f'Game: {self.player.name}')
         self.gu.set_game_form(self.gf)
         try:
             self.gu.start_game(self.player.name, self.server_addr)

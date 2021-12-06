@@ -17,9 +17,6 @@ class GameUpdater:
         self.game.set_event_handler('message', self.send_message)
         self.game.set_event_handler('end_game', self.vote_end_game)
 
-    def set_server_communicator(self, server_comm: ServerCommunicator):
-        self.server_comm = server_comm
-
     def start_game(self, name, server_addr: tuple = ('127.0.0.1', 65432)):
         logging.debug("Starting the game")
 
@@ -63,10 +60,21 @@ class GameUpdater:
                 entry = map(lambda x: int(x), entry)  # convert everything to int
 
                 self.game.update(tuple(entry))  # make a tuple and update
-                return  # don't need the function to continue
+                continue  # don't need the function to continue
 
             if entry == 'wait':
                 self.game.update_chat('Waiting for second player...')
+                continue
+
+            if entry.startswith('stats:'):
+                entry = entry.split(':')
+
+                wins = entry[1]
+                losses = entry[2]
+                draws = entry[3]
+
+                self.game.set_stats(tuple([wins, losses, draws]))
+                continue
 
             pattern = re.compile('msg:[a-zA-Z1-9]+:.+')
             if pattern.match(entry) is not None:
@@ -74,7 +82,7 @@ class GameUpdater:
                 msg = entry.replace('msg:', '')  # remove the word msg
                 logging.debug(f'Message: {msg}')
                 self.game.update_chat(msg)  # display message in chat
-                return  # don't need the function to continue
+                continue  # don't need the function to continue
 
             pattern = re.compile('opponent:[a-zA-Z1-9]+')
             if pattern.match(entry) is not None:
@@ -83,7 +91,7 @@ class GameUpdater:
                 logging.debug(f'Opponent is {opponent}')
                 self.game.set_opponent(opponent)  # set opponent
                 self.game.update_chat(f'Opponent is {opponent}')
-                return  # don't need the function to continue
+                continue  # don't need the function to continue
 
             pattern = re.compile('start:[a-zA-Z1-9]+')
             if pattern.match(entry):
@@ -91,6 +99,8 @@ class GameUpdater:
                 starts = entry.replace('start:', '')  # remove the word start to know who has first turn
                 if starts != self.game.opponent:
                     self.game.board.toggle_active_player()
+
+                continue
 
             pattern = re.compile('winner:.+')
             if pattern.match(entry):
@@ -105,8 +115,12 @@ class GameUpdater:
                     self.game.set_winner('You have won')
                 self.game.set_game_status('Game has ended')
 
+                continue
+
             if entry == 'leave' or entry == 'unleave':
                 self.game.update_chat(f'{self.game.opponent} voted to {entry}')
+
+                continue
 
     def send_update(self, _input):
         update = f'push({_input[0]},{_input[1]})'

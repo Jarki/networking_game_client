@@ -6,10 +6,10 @@ from forms.basic_form import BasicForm
 
 
 class LoginForm(BasicForm):
-    def __init__(self, container_layout, central_widget):
+    def __init__(self, central_widget):
         super().__init__()
 
-        self.container = container_layout
+        self.container = central_widget.layout()
         central_widget.window().setWindowTitle('Login')
 
         # wrapper for all widgets in the form
@@ -43,6 +43,9 @@ class LoginForm(BasicForm):
 
     def get_server_addr_input(self):
         return self.server_address_input.text()
+
+    def get_board_size_input(self):
+        return self.board_size_input.text()
 
     def add_join_button_handler(self, func):
         self.join_button.clicked.connect(func)

@@ -10,8 +10,11 @@ from PyQt5.QtCore import Qt
 
 
 class Game(BasicForm):
-    def __init__(self, container_layout: QLayout, container_widget: QWidget):
+    def __init__(self, container_widget: QWidget):
         super().__init__()
+
+        self.container_widget = container_widget
+        self.window = container_widget.window()
 
         self.container = QHBoxLayout()
 
@@ -86,8 +89,8 @@ class Game(BasicForm):
 
         self.voted_to_end = False
 
-    def build(self, container_layout: QLayout, container_widget: QWidget):
-        container_layout.addLayout(self.container)
+    def show(self):
+        self.container_widget.layout().addLayout(self.container)
 
     def set_stats(self, stats: tuple[int]):
         self.wins_label.setText(f'Wins:{stats[0]}')
@@ -120,8 +123,8 @@ class Game(BasicForm):
             self.game_chat.addItem('You voted to end the game')
             self.event_handlers['end_game']('leave')
 
-    def setup_board(self):
-        self.board = Board(10)
+    def setup_board(self, size: int = 10):
+        self.board = Board(size)
         self.board.draw(self.board_wrapper)
 
         self.board.set_event_handler("button_pressed", self.on_push)
@@ -158,7 +161,8 @@ class Game(BasicForm):
         self.player2_points_label.setText(f'{self.opponent}s\' points: {b.player2_points}')
 
     def update(self, pos: tuple):
-        self.board.push(pos)
+        if self.board is not None:
+            self.board.push(pos)
 
     def update_chat(self, update):
         self.game_chat.addItem(update)

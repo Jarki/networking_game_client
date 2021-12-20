@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
-from PyQt5.QtWidgets import QLabel, QListWidget, QLineEdit, QPushButton
+from PyQt5.QtWidgets import QVBoxLayout
+from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton
 from PyQt5.QtCore import Qt
 
 from forms.basic_form import BasicForm

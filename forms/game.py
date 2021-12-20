@@ -3,8 +3,8 @@ from game.board import Board
 
 import logging
 
-from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QVBoxLayout, QLayout
-from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QLineEdit, QPushButton, QMessageBox
+from PyQt5.QtWidgets import QGridLayout, QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QListWidget, QLineEdit, QPushButton
 
 from PyQt5.QtCore import Qt
 

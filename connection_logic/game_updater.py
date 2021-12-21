@@ -1,30 +1,95 @@
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5 import QtCore
+
 import threading
 import logging
 import re
+import time
 
 from connection_logic.server_communicator import ServerCommunicator
 from forms.game import Game
+from forms.size_chooser_form import SizeChooserForm
+from forms.waiting_form import WaitingForm
 
 
 class GameUpdater:
     def __init__(self):
         self.game = None
         self.server_comm = ServerCommunicator()
+        self.game_container = None
+        self.size_form = None
+        self.waiting_form = None
 
-    def set_game_form(self, game_form: Game):
-        self.game = game_form
+        self.show_size_form = False
+        self.show_game_form = False
+
+    def create_game_in(self, container_widget):
+        self.game_container = container_widget
+        self.game = Game(container_widget)
+
         self.game.set_event_handler('update', self.send_update)
         self.game.set_event_handler('message', self.send_message)
         self.game.set_event_handler('end_game', self.vote_end_game)
 
-    def start_game(self, name, server_addr: tuple = ('127.0.0.1', 65432)):
+    def start_game(self, name, server_addr: tuple = ('127.0.0.1', 65432), board_size=10):
         logging.debug("Starting the game")
 
         self.server_comm.connect_to_game(name, server_addr)
         self.game.set_player(name)
-        self.game.setup_board()
 
         threading.Thread(target=self.listen_to_updates).start()
+        self.waiting_form = WaitingForm(self.game_container)
+
+        self.wait_for_response()
+
+    def wait_for_response(self):
+        while True:
+            QtCore.QCoreApplication.processEvents()
+
+            if self.show_size_form:
+                if self.waiting_form is not None:
+                    self.waiting_form.clear()
+
+                self.size_form = SizeChooserForm(self.game_container)
+                self.size_form.set_button_handler(self.__get_radius)
+                return
+
+            if self.show_game_form:
+                if self.waiting_form is not None:
+                    self.waiting_form.clear()
+                if self.size_form is not None:
+                    self.size_form.clear()
+
+                self.game.show()
+                self.game.draw_board()
+
+                return
+
+    def __get_radius(self):
+        radius = 0
+
+        try:
+            radius = int(self.size_form.get_radius())
+        except ValueError:
+            msg = QMessageBox()
+            msg.setText('Радіус повинен бути числом')
+            msg.exec()
+            return
+
+        if radius < 1 or radius > 10:
+            msg = QMessageBox()
+            msg.setText('Радіус повинен знаходитись в радіусі(1, 10)')
+            msg.exec()
+            return
+
+        self.server_comm.send_message(f'size:{radius}')
+
+        self.show_size_form = False
+
+        self.size_form.clear()
+        self.waiting_form = WaitingForm(self.game_container)
+
+        self.wait_for_response()
 
     def vote_end_game(self, msg):
         self.server_comm.send_message(msg)
@@ -66,6 +131,12 @@ class GameUpdater:
                 self.game.update_chat('Waiting for second player...')
                 continue
 
+            if entry == 'choose':
+                self.show_size_form = True
+
+            if entry == "size":
+                pass
+
             if entry.startswith('stats:'):
                 entry = entry.split(':')
 
@@ -75,6 +146,11 @@ class GameUpdater:
 
                 self.game.set_stats(tuple([wins, losses, draws]))
                 continue
+
+            if entry.startswith('size:'):
+                size = entry.replace('size:', '')
+                size = int(size)
+                self.game.setup_board(size * 2)
 
             pattern = re.compile('msg:[a-zA-Z1-9]+:.+')
             if pattern.match(entry) is not None:
@@ -100,6 +176,7 @@ class GameUpdater:
                 if starts != self.game.opponent:
                     self.game.board.toggle_active_player()
 
+                self.show_game_form = True
                 continue
 
             pattern = re.compile('winner:.+')

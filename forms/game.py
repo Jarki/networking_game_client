@@ -125,12 +125,14 @@ class Game(BasicForm):
 
     def setup_board(self, size: int = 10):
         self.board = Board(size)
-        self.board.draw(self.board_wrapper)
 
         self.board.set_event_handler("button_pressed", self.on_push)
         self.board.set_event_handler("active_player_toggled", self.on_player_toggle)
         self.board.set_event_handler("new_turn", self.on_new_turn)
         self.board.set_event_handler("point", self.on_point_update)
+
+    def draw_board(self):
+        self.board.draw(self.board_wrapper)
 
     def set_winner(self, winner):
         self.winner_label.setText(winner)
@@ -141,6 +143,7 @@ class Game(BasicForm):
             self.event_handlers[event_name] = callback
 
     def on_push(self, pos: tuple):
+        print('push')
         """This function raises an "event" and update when a button on the board is pushed"""
         self.event_handlers["update"](pos)
 

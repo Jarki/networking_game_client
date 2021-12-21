@@ -6,6 +6,7 @@ from player import Player
 
 import os
 import socket
+import sys
 
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QMessageBox
@@ -19,7 +20,7 @@ class App:
 
         self.__create_window()
 
-        self.login_form = LoginForm(self.main_container, self.central_widget)
+        self.login_form = LoginForm(self.central_widget)
         self.login_form.add_join_button_handler(self.__get_login_form_inputs)
 
         self.server_addr: tuple[str, int] = ("127.0.0.1", 65432)
@@ -38,8 +39,7 @@ class App:
         self.window.setGeometry(300, 300, self.window_size['w'], self.window_size['h'])
         self.central_widget.setGeometry(0, 0, self.window_size['w'], self.window_size['h'])
 
-        self.main_container = QHBoxLayout()
-        self.central_widget.setLayout(self.main_container)
+        self.central_widget.setLayout(QHBoxLayout())
 
     def __get_login_form_inputs(self):
         self.player = Player(self.login_form.get_name_input())
@@ -60,15 +60,15 @@ class App:
 
         self.__start_game()
 
-    def __start_game(self):
+    def __start_game(self, board_size=10):
         self.gu = cl.GameUpdater()
 
-        self.gf = Game(self.main_container, self.central_widget)
+        self.login_form.clear()
 
         self.window.setWindowTitle(f'Game: {self.player.name}')
-        self.gu.set_game_form(self.gf)
+        self.gu.create_game_in(self.central_widget)
         try:
-            self.gu.start_game(self.player.name, self.server_addr)
+            self.gu.start_game(self.player.name, self.server_addr, board_size)
         except socket.gaierror:
             msg = QMessageBox()
             msg.setText("Could not connect to the server")
@@ -76,9 +76,6 @@ class App:
             msg.exec()
             return
 
-        self.login_form.clear()
-        self.gf.build(self.main_container, self.central_widget)
-
     def run(self):
         self.window.show()
-        self.app.exec()
+        sys.exit(self.app.exec())

@@ -3,6 +3,7 @@ import logging
 from game.tiles.push_tile import PushTile
 from game.tiles.tiny_tile import TinyTile
 from game.tiles.big_tile import BigTile
+from math import floor
 
 
 class Board:
@@ -125,13 +126,13 @@ class Board:
         cutout_num = 0
 
         for i in range(self.size):
-            if i < 11:
+            if i < floor(self.size / 2) + 1:
                 if not i % 2:
                     cutout_num = i + 2
 
-            if i >= 11:
+            if i >= floor(self.size / 2) + 1:
                 if i % 2:
-                    cutout_num = i - 2 * abs(20 / 2 - i) + 1
+                    cutout_num = i - 2 * abs((self.size - 1) / 2 - i) + 1
             for j in range(self.size):
                 tile = PushTile(i, j)
 
@@ -141,7 +142,6 @@ class Board:
                     else:
                         tile.make_horizontal()
                         tile.set_handler(self.push_handler)
-
                         self.board[i][j] = tile
                 else:
                     if not j % 2:
@@ -153,7 +153,7 @@ class Board:
                         tile = BigTile(i, j)
                         self.board[i][j] = tile
 
-                if abs((20 / 2) - j) - cutout_num >= 1:
+                if abs(((self.size - 1) / 2) - j) - cutout_num >= 1:
                     tile.setVisible(False)
 
                 wrapper.addWidget(tile, i, j)

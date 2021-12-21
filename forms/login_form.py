@@ -44,8 +44,5 @@ class LoginForm(BasicForm):
     def get_server_addr_input(self):
         return self.server_address_input.text()
 
-    def get_board_size_input(self):
-        return self.board_size_input.text()
-
     def add_join_button_handler(self, func):
         self.join_button.clicked.connect(func)

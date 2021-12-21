@@ -116,6 +116,9 @@ class GameUpdater:
             return
 
         for entry in data.split('/%%'):
+            if entry == '':
+                continue
+
             pattern = re.compile('push\\([0-9]+, ?[0-9]+\\)')
             if pattern.match(entry) is not None:
                 # message looks like push(0,0)
@@ -164,7 +167,7 @@ class GameUpdater:
             if pattern.match(entry) is not None:
                 # message looks like Opponent:player1
                 opponent = entry.replace('opponent:', '')  # remove the word Opponent
-                logging.debug(f'Opponent is {opponent}')
+
                 self.game.set_opponent(opponent)  # set opponent
                 self.game.update_chat(f'Opponent is {opponent}')
                 continue  # don't need the function to continue
@@ -173,10 +176,15 @@ class GameUpdater:
             if pattern.match(entry):
                 # message looks like start:player1
                 starts = entry.replace('start:', '')  # remove the word start to know who has first turn
-                if starts != self.game.opponent:
-                    self.game.board.toggle_active_player()
-
                 self.show_game_form = True
+
+                time.sleep(0.2)
+
+                print(f'starting the game is {starts}')
+                print(f'opponent is {self.game.opponent}')
+                if starts != self.game.opponent:
+                    self.game.board.active_player = True
+
                 continue
 
             pattern = re.compile('winner:.+')

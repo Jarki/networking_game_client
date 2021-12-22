@@ -1,3 +1,5 @@
+import sys
+
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5 import QtCore
 
@@ -96,6 +98,7 @@ class GameUpdater:
 
     def listen_to_updates(self):
         logging.debug(f'Listening to server')
+
         while True:
             try:
                 self.server_comm.listen_to_updates(self.update_game)
@@ -105,6 +108,9 @@ class GameUpdater:
             except ConnectionResetError:
                 print('Server connection closed')
                 break
+            except TimeoutError:
+                print("You have been timed out")
+                sys.exit()
 
     def update_ping(self):
         pass

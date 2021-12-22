@@ -110,7 +110,7 @@ class GameUpdater:
                 break
             except TimeoutError:
                 print("You have been timed out")
-                sys.exit()
+                continue
 
     def update_ping(self):
         pass
